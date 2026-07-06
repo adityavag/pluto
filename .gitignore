@@ -25,3 +25,10 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+
+# Python venvs and caches
+venv/
+worker/
+__pycache__/
+.pytest_cache/
+*.pyc
