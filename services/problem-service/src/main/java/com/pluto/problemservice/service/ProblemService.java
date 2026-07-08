@@ -2,45 +2,24 @@ package com.pluto.problemservice.service;
 
 import java.util.UUID;
 
-import org.springframework.stereotype.Service;
-
 import com.pluto.problemservice.dto.request.CreateProblemRequest;
 import com.pluto.problemservice.dto.request.ProblemFilterRequest;
 import com.pluto.problemservice.dto.request.UpdateProblemRequest;
 import com.pluto.problemservice.dto.response.PaginatedResponse;
 import com.pluto.problemservice.dto.response.ProblemResponse;
 import com.pluto.problemservice.dto.response.ProblemSummaryResponse;
-import com.pluto.problemservice.repository.ProblemRepository;
 
-import lombok.RequiredArgsConstructor;
+public interface ProblemService {
 
-@Service
-@RequiredArgsConstructor
-public class ProblemService {
+    PaginatedResponse<ProblemSummaryResponse> getAllProblems(ProblemFilterRequest filterRequest);
 
-    private final ProblemRepository problemRepository;
+    ProblemResponse getProblemById(UUID id);
 
-    public PaginatedResponse<ProblemSummaryResponse> getAllProblems(ProblemFilterRequest filterRequest) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+    ProblemResponse getProblemBySlug(String slug);
 
-    public ProblemResponse getProblemById(UUID id) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+    ProblemResponse createProblem(CreateProblemRequest request);
 
-    public ProblemResponse getProblemBySlug(String slug) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+    ProblemResponse updateProblem(UUID id, UpdateProblemRequest request);
 
-    public ProblemResponse createProblem(CreateProblemRequest request) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    public ProblemResponse updateProblem(UUID id, UpdateProblemRequest request) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    public void deleteProblem(UUID id) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+    void deleteProblem(UUID id);
 }

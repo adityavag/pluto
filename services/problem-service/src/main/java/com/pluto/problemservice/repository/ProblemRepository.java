@@ -3,6 +3,8 @@ package com.pluto.problemservice.repository;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.pluto.problemservice.entity.Problem;
@@ -10,4 +12,5 @@ import com.pluto.problemservice.entity.Problem;
 public interface ProblemRepository extends JpaRepository<Problem, UUID> {
 
     Optional<Problem> findBySlug(String slug);
+    Page<Problem> findByDifficulty(String difficulty, Pageable pageable);
 }
