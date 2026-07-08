@@ -32,3 +32,30 @@ worker/
 __pycache__/
 .pytest_cache/
 *.pyc
+
+# Java / Maven / Gradle
+target/
+build/
+.gradle/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# IDEs (VS Code, Eclipse, NetBeans, IntelliJ)
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+*.iml
+*.iws
+*.ipr
+.apt_generated/
+.sts4-cache/
+.springBeans
+/nbproject/private/
+/nbbuild/
+/nbdist/
+/.nb-gradle/
