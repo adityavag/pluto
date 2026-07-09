@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +31,10 @@ import lombok.RequiredArgsConstructor;
 public class ProblemServiceImpl implements ProblemService {
 
     private final ProblemRepository problemRepository;
+    private final CacheManager cacheManager;
 
     @Override
+    @Cacheable(value = "problem_lists", key = "#filterRequest")
     public PaginatedResponse<ProblemSummaryResponse> getAllProblems(ProblemFilterRequest filterRequest) {
         Pageable pageable = PageRequest.of(filterRequest.getPage(), filterRequest.getSize());
         Page<Problem> problemPage;
@@ -54,6 +59,7 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
+    @Cacheable(value = "problems", key = "#id", sync = true)
     public ProblemResponse getProblemById(UUID id) {
         Problem problem = problemRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Problem not found"));
@@ -61,6 +67,7 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
+    @Cacheable(value = "problems_by_slug", key = "#slug", sync = true)
     public ProblemResponse getProblemBySlug(String slug) {
         Problem problem = problemRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Problem not found"));
@@ -68,6 +75,7 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
+    @CacheEvict(value = "problem_lists", allEntries = true)
     public ProblemResponse createProblem(CreateProblemRequest request) {
         if (request.getSlug() != null && problemRepository.findBySlug(request.getSlug()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Problem with slug '" + request.getSlug() + "' already exists");
@@ -88,11 +96,14 @@ public class ProblemServiceImpl implements ProblemService {
         Problem problem = problemRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Problem not found"));
 
-        if (request.getSlug() != null && !request.getSlug().equals(problem.getSlug())) {
+        String oldSlug = problem.getSlug();
+
+        if (request.getSlug() != null && !request.getSlug().equals(oldSlug)) {
             if (problemRepository.findBySlug(request.getSlug()).isPresent()) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Problem with slug '" + request.getSlug() + "' already exists");
             }
             problem.setSlug(request.getSlug());
+            evictCacheKey("problems_by_slug", oldSlug);
         }
 
         problem.setTitle(request.getTitle());
@@ -100,15 +111,41 @@ public class ProblemServiceImpl implements ProblemService {
         problem.setDifficulty(request.getDifficulty());
 
         Problem updatedProblem = problemRepository.save(problem);
-        return mapToResponse(updatedProblem);
+        ProblemResponse response = mapToResponse(updatedProblem);
+
+        // Evict updated caches
+        evictCacheKey("problems", id);
+        evictCacheKey("problems_by_slug", response.getSlug());
+        clearCache("problem_lists");
+
+        return response;
     }
 
     @Override
     public void deleteProblem(UUID id) {
-        if (!problemRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Problem not found");
+        Problem problem = problemRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Problem not found"));
+
+        problemRepository.delete(problem);
+
+        // Evict deleted caches
+        evictCacheKey("problems", id);
+        evictCacheKey("problems_by_slug", problem.getSlug());
+        clearCache("problem_lists");
+    }
+
+    private void evictCacheKey(String cacheName, Object key) {
+        org.springframework.cache.Cache cache = cacheManager.getCache(cacheName);
+        if (cache != null) {
+            cache.evict(key);
         }
-        problemRepository.deleteById(id);
+    }
+
+    private void clearCache(String cacheName) {
+        org.springframework.cache.Cache cache = cacheManager.getCache(cacheName);
+        if (cache != null) {
+            cache.clear();
+        }
     }
 
     private ProblemResponse mapToResponse(Problem problem) {
