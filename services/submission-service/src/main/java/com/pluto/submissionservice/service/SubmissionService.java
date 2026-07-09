@@ -1,0 +1,11 @@
+package com.pluto.submissionservice.service;
+
+import java.util.UUID;
+
+import com.pluto.submissionservice.dto.request.CreateSubmissionRequest;
+import com.pluto.submissionservice.dto.response.SubmissionResponse;
+
+public interface SubmissionService {
+    SubmissionResponse createSubmission(CreateSubmissionRequest request);
+    SubmissionResponse getSubmissionById(UUID id);
+}
