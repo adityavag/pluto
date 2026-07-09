@@ -24,15 +24,18 @@ public class S3StorageService implements StorageService {
 
     private final S3Client s3Client;
     private final String bucketName;
+    private final String prefix;
     private final ObjectMapper objectMapper;
 
     public S3StorageService(
             @Value("${aws.accessKeyId}") String accessKeyId,
             @Value("${aws.secretAccessKey}") String secretAccessKey,
             @Value("${aws.region}") String region,
-            @Value("${aws.s3.bucket}") String bucketName) {
+            @Value("${aws.s3.bucket}") String bucketName,
+            @Value("${aws.s3.prefix}") String prefix) {
         
         this.bucketName = bucketName;
+        this.prefix = prefix;
         this.objectMapper = new ObjectMapper();
         
         AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKeyId, secretAccessKey);
@@ -46,7 +49,11 @@ public class S3StorageService implements StorageService {
     public String storeJson(String fileName, Map<String, Object> json) {
         try {
             String jsonString = objectMapper.writeValueAsString(json);
-            String key = fileName + ".json";
+            String cleanPrefix = (prefix != null) ? prefix.trim() : "";
+            if (cleanPrefix.endsWith("/")) {
+                cleanPrefix = cleanPrefix.substring(0, cleanPrefix.length() - 1);
+            }
+            String key = cleanPrefix.isEmpty() ? fileName + ".json" : cleanPrefix + "/" + fileName + ".json";
             
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
