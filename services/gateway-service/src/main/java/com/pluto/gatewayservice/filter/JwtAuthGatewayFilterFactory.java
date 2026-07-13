@@ -18,9 +18,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 
 @Component
-public class JwtAuthFilterFactory extends AbstractGatewayFilterFactory<JwtAuthFilterFactory.Config> {
+public class JwtAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<JwtAuthGatewayFilterFactory.Config> {
 
-    public JwtAuthFilterFactory() {
+    public JwtAuthGatewayFilterFactory() {
         super(Config.class);
     }
 
@@ -59,6 +59,8 @@ public class JwtAuthFilterFactory extends AbstractGatewayFilterFactory<JwtAuthFi
                 return chain.filter(exchange.mutate().request(mutatedRequest).build());
 
             } catch (JwtException e) {
+                System.err.println("JWT Verification failed: " + e.getMessage());
+                e.printStackTrace();
                 return onError(exchange, "Token validation failed: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
             }
         };
