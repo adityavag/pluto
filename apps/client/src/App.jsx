@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
 import ProblemsPage from './pages/ProblemsPage';
 import ProblemWorkspacePage from './pages/ProblemWorkspacePage';
+import ProfilePage from './pages/ProfilePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 
@@ -37,6 +38,7 @@ export default function App() {
           <Route element={<AppLayout />}>
             <Route path="/" element={<ProblemsPage />} />
             <Route path="/problems/:slug" element={<ProblemWorkspacePage />} />
+            <Route path="/users/:username" element={<ProfilePage />} />
           </Route>
 
           {/* Auth pages — no navbar */}

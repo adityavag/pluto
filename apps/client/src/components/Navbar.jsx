@@ -36,10 +36,13 @@ export default function Navbar() {
       <div className="ml-auto flex items-center gap-4">
         {isAuthenticated ? (
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 text-sm text-lc-text-secondary">
+            <Link
+              to={`/users/${user?.username}`}
+              className="flex items-center gap-1.5 text-sm text-lc-text-secondary hover:text-lc-accent transition-colors font-medium"
+            >
               <User size={14} />
               <span>{user?.username || 'User'}</span>
-            </div>
+            </Link>
             <button
               onClick={logout}
               className="flex items-center gap-1 text-sm text-lc-text-tertiary hover:text-lc-text-secondary transition-colors"
