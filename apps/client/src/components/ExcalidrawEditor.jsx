@@ -1,4 +1,4 @@
-import { useRef, useImperativeHandle, forwardRef, useEffect, useState } from 'react';
+import { useImperativeHandle, forwardRef, useEffect, useState } from 'react';
 import '@excalidraw/excalidraw/index.css';
 
 const ExcalidrawEditor = forwardRef(function ExcalidrawEditor(
