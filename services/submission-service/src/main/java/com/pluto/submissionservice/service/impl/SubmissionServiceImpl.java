@@ -79,6 +79,13 @@ public class SubmissionServiceImpl implements SubmissionService {
         return mapToResponse(submission);
     }
 
+    @Override
+    public java.util.List<SubmissionResponse> getSubmissionsByUserId(String userId) {
+        return submissionRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
+                .map(this::mapToResponse)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
     private SubmissionResponse mapToResponse(Submission submission) {
         return new SubmissionResponse(
                 submission.getId(),

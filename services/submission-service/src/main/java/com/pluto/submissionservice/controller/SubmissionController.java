@@ -38,4 +38,10 @@ public class SubmissionController {
         SubmissionResponse response = submissionService.getSubmissionById(id);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<java.util.List<SubmissionResponse>> getSubmissionsByUserId(@PathVariable String userId) {
+        java.util.List<SubmissionResponse> response = submissionService.getSubmissionsByUserId(userId);
+        return ResponseEntity.ok(response);
+    }
 }
