@@ -1,10 +1,11 @@
 import { useRef, useImperativeHandle, forwardRef, useEffect, useState } from 'react';
+import '@excalidraw/excalidraw/index.css';
 
 const ExcalidrawEditor = forwardRef(function ExcalidrawEditor(
   { initialData = null },
   ref
 ) {
-  const excalidrawRef = useRef(null);
+  const [excalidrawAPI, setExcalidrawAPI] = useState(null);
   const [Comp, setComp] = useState(null);
 
   // Dynamically import Excalidraw (it doesn't support SSR and is large)
@@ -17,10 +18,10 @@ const ExcalidrawEditor = forwardRef(function ExcalidrawEditor(
   // Expose getSceneData to parent via ref
   useImperativeHandle(ref, () => ({
     getSceneData: () => {
-      if (excalidrawRef.current) {
-        const elements = excalidrawRef.current.getSceneElements();
-        const appState = excalidrawRef.current.getAppState();
-        const files = excalidrawRef.current.getFiles();
+      if (excalidrawAPI) {
+        const elements = excalidrawAPI.getSceneElements();
+        const appState = excalidrawAPI.getAppState();
+        const files = excalidrawAPI.getFiles();
         return {
           type: 'excalidraw',
           version: 2,
@@ -46,7 +47,7 @@ const ExcalidrawEditor = forwardRef(function ExcalidrawEditor(
   return (
     <div className="excalidraw-wrapper h-full w-full">
       <Comp
-        ref={excalidrawRef}
+        excalidrawAPI={setExcalidrawAPI}
         theme="dark"
         initialData={initialData}
         UIOptions={{
