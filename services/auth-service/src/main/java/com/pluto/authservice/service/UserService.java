@@ -10,4 +10,5 @@ public interface UserService {
     void requestPasswordReset(PasswordResetRequest request);
     void resetPassword(ResetPasswordRequest request);
     void changePassword(Integer userId, ChangePasswordRequest request);
+    UserResponse getUserByUsername(String username);
 }

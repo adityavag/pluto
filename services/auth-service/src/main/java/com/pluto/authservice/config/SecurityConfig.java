@@ -41,6 +41,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/account/register", "/account/login",
                                 "/account/forgot-password", "/account/reset-password")
                         .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/account/users/**").permitAll()
                         .requestMatchers("/error", "/error/**").permitAll()
                         .requestMatchers(EndpointRequest.toAnyEndpoint()).permitAll()
                         .anyRequest().authenticated())
