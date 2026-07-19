@@ -55,10 +55,10 @@ public class AuthControllerTest {
 
         Mockito.when(userService.registerUser(Mockito.any(RegisterRequest.class))).thenReturn(response);
 
-        mockMvc.perform(post("/api/account/register")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(post("/account/register")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.userId").value(1))
                 .andExpect(jsonPath("$.username").value("testuser"))
@@ -82,10 +82,10 @@ public class AuthControllerTest {
 
         Mockito.when(userService.loginUser(Mockito.any(LoginRequest.class))).thenReturn(authResponse);
 
-        mockMvc.perform(post("/api/account/login")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(post("/account/login")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value("mock-jwt-token"))
                 .andExpect(jsonPath("$.user.userId").value(1));

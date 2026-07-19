@@ -32,6 +32,9 @@ public class Submission {
     @Column(name = "problem_id", nullable = false)
     private UUID problemId;
 
+    @Column(name = "user_id")
+    private String userId;
+
     @Column(name = "excalidraw_json_url")
     private String excalidrawJsonUrl;
 

@@ -27,7 +27,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     private final MessageQueueService messageQueueService;
 
     @Override
-    public SubmissionResponse createSubmission(CreateSubmissionRequest request) {
+    public SubmissionResponse createSubmission(CreateSubmissionRequest request, String userId) {
         if (request.getProblemId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Problem ID must be provided");
         }
@@ -37,6 +37,9 @@ public class SubmissionServiceImpl implements SubmissionService {
         if (request.getWriteup() == null || request.getWriteup().trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Writeup text explanation must be provided");
         }
+        if (userId == null || userId.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User ID must be provided");
+        }
 
         // 1. Fetch rubric & prompt (which validates problem existence)
         ProblemServiceClient.ProblemDto problem = problemServiceClient.getProblemById(request.getProblemId());
@@ -44,6 +47,7 @@ public class SubmissionServiceImpl implements SubmissionService {
         // 2. Write metadata to database (PENDING)
         Submission submission = new Submission();
         submission.setProblemId(request.getProblemId());
+        submission.setUserId(userId);
         submission.setWriteup(request.getWriteup());
         submission.setStatus("PENDING");
         
@@ -75,10 +79,18 @@ public class SubmissionServiceImpl implements SubmissionService {
         return mapToResponse(submission);
     }
 
+    @Override
+    public java.util.List<SubmissionResponse> getSubmissionsByUserId(String userId) {
+        return submissionRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
+                .map(this::mapToResponse)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
     private SubmissionResponse mapToResponse(Submission submission) {
         return new SubmissionResponse(
                 submission.getId(),
                 submission.getProblemId(),
+                submission.getUserId(),
                 submission.getExcalidrawJsonUrl(),
                 submission.getWriteup(),
                 submission.getStatus(),

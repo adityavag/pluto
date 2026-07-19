@@ -142,6 +142,13 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public UserResponse getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return mapToResponse(user);
+    }
+
     private UserResponse mapToResponse(User user) {
         UserResponse response = new UserResponse();
         response.setUserId(user.getUserId());

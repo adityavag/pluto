@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class SubmissionResponse {
     private UUID id;
     private UUID problemId;
+    private String userId;
     private String excalidrawJsonUrl;
     private String writeup;
     private String status;

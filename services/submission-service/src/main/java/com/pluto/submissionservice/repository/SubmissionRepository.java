@@ -9,4 +9,5 @@ import com.pluto.submissionservice.entity.Submission;
 
 @Repository
 public interface SubmissionRepository extends JpaRepository<Submission, UUID> {
+    java.util.List<Submission> findByUserIdOrderByCreatedAtDesc(String userId);
 }

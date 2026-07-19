@@ -116,7 +116,8 @@ async def evaluate_solution(request: EvaluationRequest):
 def health_check():
     return {"status": "ok", "service": "evaluation-service"}
 
-{
-    "parsed_diagram": "Components:\n  - [RECTANGLE] User Client App\n  - [RECTANGLE] API Gateway\n  - [RECTANGLE] Rate Limiter Service\n(Token Bucket)\n  - [ELLIPSE] Redis Cluster\n(Token Counts)\n\nNotes:\n  - Check Limit\n\nConnections:\n  - User Client App → API Gateway\n  - API Gateway → Rate Limiter Service\n(Token Bucket)\n  - Rate Limiter Service\n(Token Bucket) → Redis Cluster\n(Token Counts)",
-    "feedback": "### ✅ What You Did Well\n\n1. **Component Design**: The HLD diagram clearly outlines the components involved in the rate limiting system, including the User Client App, API Gateway, Rate Limiter Service, and Redis Cluster.\n2. **Flow Diagram**: The flow diagram shows how user requests are routed through the API Gateway to the Rate Limiter Service, with the Token Bucket algorithm used for rate limiting.\n3. **Data Storage**: The use of a distributed Redis cluster ensures that the rate limit counts are stored efficiently across multiple nodes.\n\n### ⚠️ Areas for Improvement\n\n1. **Concurrency Handling**: While the diagram mentions handling concurrency and race conditions, it does not provide specific details on how these are managed in the Rate Limiter Service.\n2. **Error Handling**: The HLD does not specify error handling mechanisms for cases where the rate limit check fails or other issues occur.\n\n### 💡 Suggestions & Recommendations\n\n1. **Concurrency Management**: Implementing a locking mechanism within the Rate Limiter Service to handle concurrent requests effectively can prevent race conditions and ensure that each user's rate limits are accurately tracked.\n2. **Error Handling**: Enhance error handling in the Rate Limiter Service to provide meaningful feedback to the API Gateway when issues arise, such as insufficient tokens or invalid request parameters.\n\n### 📝 Final Summary\n\nThe HLD provides a clear and concise design for a distributed rate limiting system using the Token Bucket algorithm. The use of Redis ensures high availability and scalability. However, the current implementation does not address concurrency management and error handling effectively. By incorporating these improvements, the design can be made more robust and reliable."
-}
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.getenv("PORT", "8084"))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
