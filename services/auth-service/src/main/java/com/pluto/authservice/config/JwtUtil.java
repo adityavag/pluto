@@ -15,74 +15,52 @@ import java.util.Map;
 @Component
 public class JwtUtil {
 
-    private String getAdminSecret() {
-        String secret = System.getProperty("JWT_ADMIN_SECRET");
+    private String getSecret() {
+        String secret = System.getProperty("JWT_SECRET");
         if (secret == null || secret.trim().isEmpty()) {
-            secret = System.getProperty("JWT_SECRET");
+            throw new IllegalStateException("JWT_SECRET environment variable is not set");
         }
         return secret;
     }
 
-    private String getUserSecret() {
-        String secret = System.getProperty("JWT_USER_SECRET");
-        if (secret == null || secret.trim().isEmpty()) {
-            secret = System.getProperty("JWT_SECRET");
-        }
-        return secret;
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(getSecret().getBytes(StandardCharsets.UTF_8));
     }
 
-    private Key getSigningKey(String secret) {
-        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-    }
-
-    public String generateToken(Integer userId, String email, String role) {
-        boolean isAdmin = "admin".equalsIgnoreCase(role);
-        String secret = isAdmin ? getAdminSecret() : getUserSecret();
-        
-        String expiresConf;
-        if (isAdmin) {
-            expiresConf = System.getProperty("JWT_ADMIN_EXPIRES_IN");
-            if (expiresConf == null) expiresConf = System.getProperty("JWT_EXPIRES_IN");
-        } else {
-            expiresConf = System.getProperty("JWT_USER_EXPIRES_IN");
-            if (expiresConf == null) expiresConf = System.getProperty("JWT_EXPIRES_IN");
-        }
-        
+    public String generateToken(Integer userId, String username, String email, String role) {
+        String expiresConf = System.getProperty("JWT_EXPIRES_IN");
         long expiryMs = parseExpiration(expiresConf);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
+        claims.put("username", username);
         claims.put("email", email);
         claims.put("role", role);
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(email)
+                .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiryMs))
-                .signWith(getSigningKey(secret))
+                .signWith(getSigningKey())
                 .compact();
     }
 
     public Claims validateAndExtractClaims(String token) {
-        // Try admin secret first, then fallback to user secret
         try {
             return Jwts.parserBuilder()
-                    .setSigningKey(getSigningKey(getAdminSecret()))
+                    .setSigningKey(getSigningKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-        } catch (JwtException adminEx) {
-            try {
-                return Jwts.parserBuilder()
-                        .setSigningKey(getSigningKey(getUserSecret()))
-                        .build()
-                        .parseClaimsJws(token)
-                        .getBody();
-            } catch (JwtException userEx) {
-                throw new JwtException("Invalid or expired token.", userEx);
-            }
+        } catch (JwtException e) {
+            throw new JwtException("Invalid or expired token.", e);
         }
+    }
+
+    /** Convenience extractor for the username claim. */
+    public String extractUsername(String token) {
+        return validateAndExtractClaims(token).get("username", String.class);
     }
 
     private long parseExpiration(String exp) {
@@ -100,7 +78,7 @@ public class JwtUtil {
             } else if (exp.endsWith("d")) {
                 return Long.parseLong(exp.substring(0, exp.length() - 1)) * 24 * 60 * 60 * 1000L;
             } else {
-                return Long.parseLong(exp); // Assume milliseconds or seconds
+                return Long.parseLong(exp);
             }
         } catch (NumberFormatException e) {
             return 15 * 60 * 1000L;

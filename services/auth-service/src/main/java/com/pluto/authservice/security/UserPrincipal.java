@@ -27,10 +27,10 @@ public class UserPrincipal implements UserDetails {
         this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().toUpperCase()));
     }
 
-    public UserPrincipal(Integer userId, String email, String role) {
+    public UserPrincipal(Integer userId, String username, String email, String role) {
         this.userId = userId;
         this.email = email;
-        this.username = email;
+        this.username = username;
         this.password = "";
         this.role = role;
         this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
