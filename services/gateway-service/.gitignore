@@ -1,0 +1,23 @@
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Environment variables
+.env
+.env.*
+
+# IDEs and Editors
+.idea/
+*.iws
+*.iml
+*.ipr
+.classpath
+.project
+.settings/
+.factorypath
+.vscode/
+
+# OS and Logs
+.DS_Store
+*.log
