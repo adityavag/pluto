@@ -1,0 +1,34 @@
+project_name = "pluto"
+aws_region   = "us-east-1"
+
+# Sensitive values
+# Keep them out of version control (for example in terraform.tfvars, SSM, or CI secrets).
+db_password           = "change-me"
+jwt_secret            = "change-me-min-32-chars"
+rabbitmq_password     = "change-me"
+aws_access_key_id     = "AKIA..."
+aws_secret_access_key = "change-me"
+
+# Optional JWT split keys (defaults to jwt_secret when empty)
+jwt_user_secret  = ""
+jwt_admin_secret = ""
+
+cors_allowed_origin = "http://your-frontend-domain"
+ollama_base_url     = "http://host.docker.internal:11434"
+ollama_model        = "llama3.1:8b"
+
+# Replace with real image URIs after pushing images to ECR
+client_image       = "123456789012.dkr.ecr.us-east-1.amazonaws.com/pluto/client:latest"
+gateway_image      = "123456789012.dkr.ecr.us-east-1.amazonaws.com/pluto/gateway-service:latest"
+auth_image         = "123456789012.dkr.ecr.us-east-1.amazonaws.com/pluto/auth-service:latest"
+problem_image      = "123456789012.dkr.ecr.us-east-1.amazonaws.com/pluto/problem-service:latest"
+submission_image   = "123456789012.dkr.ecr.us-east-1.amazonaws.com/pluto/submission-service:latest"
+user_profile_image = "123456789012.dkr.ecr.us-east-1.amazonaws.com/pluto/user-profile-service:latest"
+discussion_image   = "123456789012.dkr.ecr.us-east-1.amazonaws.com/pluto/discussion-service:latest"
+evaluation_image   = "123456789012.dkr.ecr.us-east-1.amazonaws.com/pluto/evaluation-service:latest"
+
+# Optional overrides
+client_container_port = 80
+desired_count         = 1
+db_instance_class     = "db.t4g.micro"
+redis_node_type       = "cache.t3.micro"
