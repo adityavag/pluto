@@ -182,7 +182,3 @@ npm run dev
 The client runs at `http://localhost:5173` and communicates with the backend through the gateway at `http://localhost:8000`.
 
 ---
-
-## License
-
-This project is developed as a personal portfolio project and is not licensed for commercial use.
